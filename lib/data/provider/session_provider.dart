@@ -1,5 +1,3 @@
-// 1. 창고 데이터
-
 import 'package:flutter/material.dart';
 import 'package:flutter_blog/_core/constants/http.dart';
 import 'package:flutter_blog/_core/constants/move.dart';
@@ -10,6 +8,7 @@ import 'package:flutter_blog/data/repository/user_repository.dart';
 import 'package:flutter_blog/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// 1. 창고 데이터
 class SessionUser {
   // 1. 화면 context에 접근하는 법
   final mContext = navigatorKey.currentContext;
@@ -64,6 +63,7 @@ class SessionUser {
 
     await secureStorage.delete(key: "jwt");
 
+    // 지금까지 쌓인 모든 것들을 날림.
     Navigator.pushNamedAndRemoveUntil(mContext!, "/login", (route) => false);
   }
 }
