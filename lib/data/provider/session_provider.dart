@@ -56,7 +56,16 @@ class SessionUser {
     }
   }
 
-  Future<void> logout() async {}
+  // JWT는 로그아웃할 때 서버측으로 요청할 필요가 없다.
+  Future<void> logout() async {
+    this.jwt = null;
+    this.isLogin = false;
+    this.user = null;
+
+    await secureStorage.delete(key: "jwt");
+
+    Navigator.pushNamedAndRemoveUntil(mContext!, "/login", (route) => false);
+  }
 }
 
 // 2. 창고 관리자
