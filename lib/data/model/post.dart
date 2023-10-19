@@ -2,12 +2,12 @@ import 'package:flutter_blog/data/model/user.dart';
 import 'package:intl/intl.dart';
 
 class Post {
-  final int id;
-  final String title;
-  final String content;
-  final User user;
-  final DateTime created;
-  final DateTime updated;
+  int id;
+  String title;
+  String content;
+  User user;
+  DateTime created;
+  DateTime updated;
 
   Post({
     required this.id,
@@ -18,7 +18,7 @@ class Post {
     required this.updated,
   });
 
-// Dart 객체를 통신을 위한 Map 형태로 변환합니다.
+  // Dart 객체를 통신을 위한 Map 형태로 변환합니다.
   Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,
@@ -28,7 +28,7 @@ class Post {
         "updated": updated
       };
 
-// Map 형태로 받아서 Dart 객체로 변환합니다.
+  // Map 형태로 받아서 Dart 객체로 변환합니다.
   Post.fromJson(Map<String, dynamic> json)
       : id = json["id"],
         title = json["title"],
@@ -37,7 +37,7 @@ class Post {
         created = DateFormat("yyyy-mm-dd").parse(json["created"]),
         updated = DateFormat("yyyy-mm-dd").parse(json["updated"]);
 
-  // TODO 2 : 체크해보기
+  // TODO 2: 체크해보기
   String getUpdated() {
     return DateFormat.MMMd().format(updated);
   }

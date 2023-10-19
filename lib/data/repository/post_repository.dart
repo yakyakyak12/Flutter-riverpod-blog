@@ -7,36 +7,48 @@ import 'package:logger/logger.dart';
 
 // V -> P(전역프로바이더, 뷰모델) -> R
 class PostRepository {
-  // 토큰을 전달 받는다. (jwt)
   Future<ResponseDTO> fetchPostList(String jwt) async {
     try {
-      // 헤더를 전달해야 한다. 토큰
       // 1. 통신
       final response = await dio.get("/post",
           options: Options(headers: {"Authorization": "${jwt}"}));
 
       // 2. ResponseDTO 파싱
-      ResponseDTO responseDTO =
-          ResponseDTO.fromJson(response.data); // 1. DTO 형태로 파싱
+      ResponseDTO responseDTO = ResponseDTO.fromJson(response.data);
 
-      // 3. ResponseDTO의 데이터 파싱
+      // 3. ResponseDTO의 data 파싱
       List<dynamic> mapList = responseDTO.data as List<dynamic>;
       List<Post> postList = mapList.map((e) => Post.fromJson(e)).toList();
 
       // 4. 파싱된 데이터를 다시 공통 DTO로 덮어씌우기
       responseDTO.data = postList;
 
-      // responseDTO.data = User.fromJson(responseDTO.data);
       return responseDTO;
     } catch (e) {
-      // 200이 아니면 catch로 감
-      return ResponseDTO(-1, "중복되는 유저명입니다", null);
+      return ResponseDTO(-1, "게시글 목록 불러오기 실패", null);
     }
   }
 
-  Future<ResponseDTO> fetchPost(String jwt, PostSaveReqDTO dto) async {
+  Future<ResponseDTO> fetchPost(String jwt, int id) async {
     try {
-      // 헤더를 전달해야 한다. 토큰
+      // 통신
+      Response response = await dio.get("/post/$id",
+          options: Options(headers: {"Authorization": "$jwt"}));
+
+      // 응답 받은 데이터 파싱
+      ResponseDTO responseDTO = ResponseDTO.fromJson(response.data);
+      responseDTO.data = Post.fromJson(responseDTO.data);
+
+      return responseDTO;
+    } catch (e) {
+      return ResponseDTO(-1, "게시글 한건 불러오기 실패", null);
+    }
+  }
+
+  // deletePost, updatePost, savePost
+  // fetchPost, fetchPostList
+  Future<ResponseDTO> savePost(String jwt, PostSaveReqDTO dto) async {
+    try {
       // 1. 통신
       final response = await dio.post("/post",
           data: dto.toJson(),
@@ -45,24 +57,17 @@ class PostRepository {
       Logger().d(response.data);
 
       // 2. ResponseDTO 파싱
-      ResponseDTO responseDTO =
-          ResponseDTO.fromJson(response.data); // 1. DTO 형태로 파싱
+      ResponseDTO responseDTO = ResponseDTO.fromJson(response.data);
       Logger().d(responseDTO.data);
 
-      // 3. ResponseDTO의 데이터 파싱
+      // 3. ResponseDTO의 data 파싱
       Post post = Post.fromJson(responseDTO.data);
-      Logger().d(responseDTO.data);
 
       // 4. 파싱된 데이터를 다시 공통 DTO로 덮어씌우기
       responseDTO.data = post;
-      Logger().d(responseDTO.data);
 
-      // responseDTO.data = User.fromJson(responseDTO.data);
       return responseDTO;
     } catch (e) {
-      Logger().d("일로오나?");
-
-      // 200이 아니면 catch로 감
       return ResponseDTO(-1, "게시글 작성 실패", null);
     }
   }

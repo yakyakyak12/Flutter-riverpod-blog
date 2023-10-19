@@ -6,6 +6,7 @@ import 'package:flutter_blog/data/provider/session_provider.dart';
 import 'package:flutter_blog/ui/widgets/custom_auth_text_form_field.dart';
 import 'package:flutter_blog/ui/widgets/custom_elavated_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 
 class LoginForm extends ConsumerWidget {
   final _formKey = GlobalKey<FormState>();
@@ -40,8 +41,12 @@ class LoginForm extends ConsumerWidget {
                 if (_formKey.currentState!.validate()) {
                   LoginReqDTO loginReqDTO = LoginReqDTO(
                       username: _username.text, password: _password.text);
+                  Logger().d("로그인 폼에서 세션 가기전 ${_username} ");
+                  Logger().d("로그인 폼에서 세션 가기전 ${_password} ");
                   ref.read(sessionProvider).login(loginReqDTO);
+                  Logger().d("로그인 폼 세션 나옴. ${loginReqDTO}");
                 }
+                Logger().d("로그인 폼 나감. ${_password}");
               }),
         ],
       ),

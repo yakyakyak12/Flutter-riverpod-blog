@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_blog/_core/constants/http.dart';
 import 'package:flutter_blog/data/dto/response_dto.dart';
 import 'package:flutter_blog/data/dto/user_request.dart';
@@ -7,10 +8,12 @@ import 'package:flutter_blog/data/model/user.dart';
 class UserRepository {
   Future<ResponseDTO> fetchJoin(JoinReqDTO requestDTO) async {
     try {
-      final response = await dio.post("/join", data: requestDTO.toJson());
-      ResponseDTO responseDTO =
-          ResponseDTO.fromJson(response.data); // 1. DTO 형태로 파싱
-      // responseDTO.data = User.fromJson(responseDTO.data);
+      // dynamic -> http body
+      Response<dynamic> response =
+          await dio.post("/join", data: requestDTO.toJson());
+      ResponseDTO responseDTO = ResponseDTO.fromJson(response.data);
+      //responseDTO.data = User.fromJson(responseDTO.data);
+
       return responseDTO;
     } catch (e) {
       // 200이 아니면 catch로 감
@@ -20,12 +23,15 @@ class UserRepository {
 
   Future<ResponseDTO> fetchLogin(LoginReqDTO requestDTO) async {
     try {
-      final response = await dio.post("/login", data: requestDTO.toJson());
-      ResponseDTO responseDTO =
-          ResponseDTO.fromJson(response.data); // 1. DTO 형태로 파싱
+      Response<dynamic> response =
+          await dio.post<dynamic>("/login", data: requestDTO.toJson());
+
+      print(response.data);
+
+      ResponseDTO responseDTO = ResponseDTO.fromJson(response.data);
       responseDTO.data = User.fromJson(responseDTO.data);
 
-      final jwt = response.headers["Authorization"]; // 토큰 보내기
+      final jwt = response.headers["Authorization"];
 
       if (jwt != null) {
         responseDTO.token = jwt.first;
@@ -34,7 +40,7 @@ class UserRepository {
       return responseDTO;
     } catch (e) {
       // 200이 아니면 catch로 감
-      return ResponseDTO(-1, "유저네임 혹은 비번이 틀렸습니다.", null);
+      return ResponseDTO(-1, "유저네임 혹은 비번이 틀렸습니다", null);
     }
   }
 }

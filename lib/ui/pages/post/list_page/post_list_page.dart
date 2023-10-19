@@ -17,15 +17,13 @@ class PostListPage extends ConsumerWidget {
       key: scaffoldKey,
       drawer: CustomNavigation(scaffoldKey),
       appBar: AppBar(
-        title: const Text("Blog"),
+        title: Text("Blog"),
       ),
       body: RefreshIndicator(
         key: refreshKey,
         onRefresh: () async {
           Logger().d("리플래시됨");
-          ref
-              .read(postListProvider.notifier)
-              .notifyInit(); // 창고 관리자를 호출해 바뀐 값을 동기화 시킴
+          ref.read(postListProvider.notifier).notifyInit();
         },
         child: PostListBody(),
       ),

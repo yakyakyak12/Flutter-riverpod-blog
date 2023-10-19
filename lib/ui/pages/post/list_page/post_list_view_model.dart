@@ -6,7 +6,6 @@ import 'package:flutter_blog/data/provider/session_provider.dart';
 import 'package:flutter_blog/data/repository/post_repository.dart';
 import 'package:flutter_blog/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
 
 // 1. 창고 데이터
 class PostListModel {
@@ -14,7 +13,7 @@ class PostListModel {
   PostListModel(this.posts);
 }
 
-// 2. 창고 (최초에 null을 넣어줄것이기 떄문에 ? 넣어줌)
+// 2. 창고
 class PostListViewModel extends StateNotifier<PostListModel?> {
   PostListViewModel(super._state, this.ref);
 
@@ -23,32 +22,31 @@ class PostListViewModel extends StateNotifier<PostListModel?> {
 
   Future<void> notifyInit() async {
     // jwt 가져오기
-    SessionUser sessionUser = ref.read(sessionProvider);
+    SessionStore sessionStore = ref.read(sessionProvider);
+
     ResponseDTO responseDTO =
-        await PostRepository().fetchPostList(sessionUser.jwt!);
+        await PostRepository().fetchPostList(sessionStore.jwt!);
     state = PostListModel(responseDTO.data);
   }
 
   Future<void> notifyAdd(PostSaveReqDTO dto) async {
-    SessionUser sessionUser = ref.read(sessionProvider);
+    SessionStore sessionStore = ref.read(sessionProvider);
 
     ResponseDTO responseDTO =
-        await PostRepository().fetchPost(sessionUser.jwt!, dto);
+        await PostRepository().savePost(sessionStore.jwt!, dto);
 
     if (responseDTO.code == 1) {
-      Logger().d("실행되니? ${responseDTO.code}");
-      Post newPost = responseDTO.data as Post; // 1. dynamic(Post)
+      Post newPost = responseDTO.data as Post; // 1. dynamic(Post) -> 다운캐스팅
       List<Post> newPosts = [
         newPost,
         ...state!.posts
       ]; // 2. 기존 상태에 데이터 추가 [전개연산자]
       state = PostListModel(
-          newPosts); // 3. 뷰모델(창고) 데이터 갱신 완료. -> watch 구독자는 rebuild됨.
-      Navigator.pop(mContext!);
+          newPosts); // 3. 뷰모델(창고) 데이터 갱신이 완료 -> watch 구독자는 rebuild됨.
+      Navigator.pop(mContext!); // 4. 글쓰기 화면 pop
     } else {
-      Logger().d("실행되니2? ${responseDTO.code}");
       ScaffoldMessenger.of(mContext!).showSnackBar(
-          SnackBar(content: Text("이거 작성 실패 : ${responseDTO.msg}")));
+          SnackBar(content: Text("게시물 작성 실패 : ${responseDTO.msg}")));
     }
   }
 }
